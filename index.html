@@ -8,5 +8,24 @@
 	</head>
 	<body>
 		Working
+		<br>
+		Test this server 
+		<button onclick="myFunction()">Click me</button>
+
+		<p id="demo"></p>
+
+<script>
+function myFunction() {
+			fetch ("http://localhost:8000",{method:"POST",body:'{"ip":"Rocket","password":"Rocket","file":"neco"}'})
+				.then(response => response.blob())
+				.then(blob => {
+				  const url = URL.createObjectURL(blob);
+				  const a = document.createElement('a');
+				  a.href = url;
+				  a.download = 'servertest.gif';
+				  a.click();
+				});
+}
+</script>
 	</body>
 </html>

@@ -7,9 +7,8 @@ use rocket::serde::{Deserialize, json};
 #[derive(Debug, PartialEq, Deserialize)]
 #[serde(crate = "rocket::serde")]
 struct Data<'r> {
-    ip: &'r str,
     password: &'r str,
-    stars: usize,
+    file: &'r str,
 }
 
 #[get("/<_..>")]
@@ -23,19 +22,20 @@ async fn index() -> Option<NamedFile> {
 }
 
 #[post("/",data="<input>")]
-fn test(input:&str)->&'static str{
+fn request_handler(input:&str)->&'static [u8]{
     println!("papu");
     println!("{}",input);
-let data: Data = json::from_str(input).unwrap();
-if (data==Data { ip: "Rocket",password: "Rocket", stars: 5, }){
-    return "hola"
-}
-"No hola"
+    let data: Data = json::from_str(input).unwrap();
+   if data.file=="neco" {
+        let file = include_bytes!("../neco-arc.gif");
+        return file
+    }
+    br"No hola"
 }
 
 #[launch]
 fn rocket() -> _ {
     let config = Config::default();
     rocket::custom(config).mount("/", routes![index]).mount("/", routes![everything])
-                          .mount("/",routes![test])
+                          .mount("/",routes![request_handler])
 }
