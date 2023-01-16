@@ -1,4 +1,5 @@
 use rocket::response::Redirect;
+use rocket::fs::NamedFile;
 #[macro_use] extern crate rocket;
 
 #[get("/<_..>")]
@@ -7,13 +8,11 @@ fn everything() -> Redirect{
 }
 
 #[get("/")]
-fn papu()-> String{
-"hola mundo".to_string()
+async fn index() -> Option<NamedFile> {
+    NamedFile::open("index.html").await.ok()
 }
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![papu]).mount("/", routes![everything])
-    //rocket::build().mount("/", routes![hello])
+    rocket::build().mount("/", routes![index]).mount("/", routes![everything])
 }
-
