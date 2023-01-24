@@ -16,7 +16,7 @@
 
 <script>
 function myFunction() {
-			fetch ("http://localhost:8000",{method:"POST",body:'{"ip":"Rocket","password":"Rocket","file":"neco"}'})
+			fetch ("http://localhost:8000",{method:"POST",body:'{"file":"neco-arc","password":"none","name":"neco"}'})
 				.then(response => response.blob())
 				.then(blob => {
 				  const url = URL.createObjectURL(blob);
