@@ -33,7 +33,7 @@ fn request_handler(input:&str)->&'static [u8]{
             .expect("Should have been able to read the file");
         let parsed = json::parse(&contents).unwrap();
         for (key, _) in parsed.entries() {
-            if parsed[key]==data["key"]{
+            if key==data["key"]{
                 if parsed[key]["password"]=="none"{
                     return serve_file(&data["file"], &parsed[key]["files"]);
                 }else{
@@ -61,60 +61,35 @@ fn rocket() -> _ {
                           .mount("/",routes![request_handler])
 }
 
-fn serve_file(path:&json::JsonValue,files:&json::JsonValue)->Vec<u8>{
+fn serve_file(path:&json::JsonValue,files:&json::JsonValue)->&'static [u8]{
     if files.is_array()==false{
         println!("Error in the file configuration, files must be an array");
-        return b"Error in the file configuration, files must be an array".to_vec()
+        return b"Error in the file configuration, files must be an array"
     }
     if path.is_string()==false{
         println!("Error in the request, requested path must be a string");
-        return b"Error in the request, requested path must be a string".to_vec()
+        return b"Error in the request, requested path must be a string"
     }
     if Path::new(path.as_str().unwrap()).exists()==false{
         println!("File requested does not exist");
-        return b"File requested does not exist".to_vec()
+        return b"File requested does not exist"
     }
     for i in 0..files.len(){
         if files[i].is_string()==false{
             println!("Error in configuration, path is not a string");
-            return b"Error in configuration, path is not a string".to_vec()
+            return b"Error in configuration, path is not a string"
         }
         if files[i].as_str()==path.as_str(){
-    let file = fs::read(Path::new(files[i].as_str().unwrap())).unwrap();
-    return file;
+        let file = fs::read(Path::new(files[i].as_str().unwrap())).unwrap();
+       //let file_static: &'static [u8] = unsafe { std::mem::transmute(file.as_slice()) };
+       let file_static: &'static [u8] = unsafe { std::mem::transmute(file.as_slice()) };
+    return file_static;
+    //return file;
         }
         println!("Cannot serve file");
-        return b"Cannot serve file".to_vec()
+        return b"Cannot serve file"
     }
     println!("Error sharing the file");
-    b"Error sharing the file".to_vec()
+    b"Error sharing the file"
 }
 
-//fn serve_file(path:&json::JsonValue,files:&json::JsonValue)->&'static [u8]{
-//    if files.is_array()==false{
-//        println!("Error in the file configuration, files must be an array");
-//        return b"Error in the file configuration, files must be an array"
-//    }
-//    if path.is_string()==false{
-//        println!("Error in the request, requested path must be a string");
-//        return b"Error in the request, requested path must be a string"
-//    }
-//    if Path::new(path.as_str().unwrap()).exists()==false{
-//        println!("File requested does not exist");
-//        return b"File requested does not exist"
-//    }
-//    for i in 0..files.len(){
-//        if files[i].is_string()==false{
-//            println!("Error in configuration, path is not a string");
-//            return b"Error in configuration, path is not a string"
-//        }
-//        if files[i].as_str()==path.as_str(){
-//            let file:&[u8] = &fs::read(Path::new(files[i].as_str().unwrap())).unwrap();
-//            return file;
-//        }
-//        println!("Cannot serve file");
-//        return b"Cannot serve file"
-//    }
-//    println!("Error sharing the file");
-//    b"Error sharing the file"
-//}
