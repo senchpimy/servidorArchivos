@@ -7,12 +7,13 @@
 		<link href="css/style.css" rel="stylesheet">
 	</head>
 	<body>
-		Working
-		<br>
-		Test this server 
-		<button onclick="myFunction()">Click me</button>
-
-		<p id="demo"></p>
+		<h1>File Server</h1>
+		Check if the server is running corretly clicking  
+		<button onclick="myFunction()">this</button>
+		<br><br>
+		Or execute the following command:<br><br>
+		<b>curl -X POST localhost:8000 -d '{"name":"neco","password":"none","file":"neco-arc"}' &gt&gt test.gif\
+</b>
 
 <script>
 function myFunction() {
