@@ -112,13 +112,25 @@ func verifyFile(path string, files gjson.Result,w http.ResponseWriter) {
 	fmt.Println("Cannot serve file")
 	w.Write([]byte("Cannot serve file"))
 }
+
 func serveFile(w http.ResponseWriter, path string)  {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		w.Write([]byte("Error obtaining info about the file"))
+		return
+	}
+	if fileInfo.IsDir() {
+	// file is a directory
+	//returning all the files in the dir
+		w.Write([]byte("Error obtaining info about the file"))
+		return
+	} else {
 			file, err := os.ReadFile(path)
 			if err !=nil{
 				log.Fatal(err)
 			}
 			w.Write(file)
-	
+	}
 }
 
 func main() {
