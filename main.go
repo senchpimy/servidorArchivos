@@ -101,11 +101,14 @@ func verifyFile(path string, files gjson.Result,w http.ResponseWriter) {
 	}
 	for i := 0; i < len(files.Array()); i++ {
 		if files.Get(fmt.Sprintf("%d", i)).String() == path {
+			/*
 			file, err := os.ReadFile(files.Get(fmt.Sprintf("%d",i)).String())
 			if err !=nil{
 				log.Fatal(err)
 			}
 			w.Write(file)
+			*/
+			serveFile(w,path)
 			return
 		}
 	}
@@ -122,7 +125,7 @@ func serveFile(w http.ResponseWriter, path string)  {
 	if fileInfo.IsDir() {
 	// file is a directory
 	//returning all the files in the dir
-		w.Write([]byte("Error obtaining info about the file"))
+		w.Write([]byte("Getting all the files piupiupiu"))
 		return
 	} else {
 			file, err := os.ReadFile(path)
@@ -134,10 +137,10 @@ func serveFile(w http.ResponseWriter, path string)  {
 }
 
 func main() {
-	fmt.Println("Sever start:"+PORT)
-r := mux.NewRouter()
-r.HandleFunc("/{_}", everything).Methods("GET")
-r.HandleFunc("/", index).Methods("GET")
-r.HandleFunc("/", requestHandler).Methods("POST")
-http.ListenAndServe(PORT, r)
+	fmt.Println("Sever start"+PORT)
+	r := mux.NewRouter()
+	r.HandleFunc("/{_}", everything).Methods("GET")
+	r.HandleFunc("/", index).Methods("GET")
+	r.HandleFunc("/", requestHandler).Methods("POST")
+	http.ListenAndServe(PORT, r)
 }
