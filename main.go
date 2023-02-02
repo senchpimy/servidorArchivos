@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"log"
+	"html/template"
 
 	"github.com/gorilla/mux"
 	"github.com/tidwall/gjson"
@@ -13,13 +14,30 @@ import (
 
 const FILES_TO_SERVE = "/home/plof/Documents/Goproyects/servidorArchivos/config.json"
 const TRIES_TO_GET_A_FILE = 10
+const PORT=":8000"
+const URL="http://localhost"
+
+
+
+type template_contents struct{
+Port string
+Url string
+}
 
 func everything(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+	t,err:= template.ParseFiles("index.html")
+	if err != nil {
+		panic(err)
+	}
+	content:=template_contents{Port:PORT,Url:URL}
+	err=t.Execute(w,content)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func requestHandler(w http.ResponseWriter, r *http.Request) {
@@ -47,11 +65,11 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	for key, element := range value {
 		if key == data.String() {
 			if element.Get("password").Str == "none" {
-				serveFile(gjson.GetBytes(input, "file").String(), element.Get("files"),w)
+				verifyFile(gjson.GetBytes(input, "file").String(), element.Get("files"),w)
 				return
 			} else {
 				if element.Get("password").Str == gjson.GetBytes(input, "password").String() {
-					serveFile(gjson.GetBytes(input, "file").String(), element.Get("files"),w)
+					verifyFile(gjson.GetBytes(input, "file").String(), element.Get("files"),w)
 				return
 				} else {
 					fmt.Println("Wrong password")
@@ -71,7 +89,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Server Error"))
 }
 
-func serveFile(path string, files gjson.Result,w http.ResponseWriter) {
+func verifyFile(path string, files gjson.Result,w http.ResponseWriter) {
 	if !files.IsArray() {
 		fmt.Println("Error in the file configuration, files must be an array")
 		return
@@ -94,12 +112,20 @@ func serveFile(path string, files gjson.Result,w http.ResponseWriter) {
 	fmt.Println("Cannot serve file")
 	w.Write([]byte("Cannot serve file"))
 }
+func serveFile(w http.ResponseWriter, path string)  {
+			file, err := os.ReadFile(path)
+			if err !=nil{
+				log.Fatal(err)
+			}
+			w.Write(file)
+	
+}
 
 func main() {
-	fmt.Println("Sever start")
+	fmt.Println("Sever start:"+PORT)
 r := mux.NewRouter()
 r.HandleFunc("/{_}", everything).Methods("GET")
 r.HandleFunc("/", index).Methods("GET")
 r.HandleFunc("/", requestHandler).Methods("POST")
-http.ListenAndServe(":8000", r)
+http.ListenAndServe(PORT, r)
 }

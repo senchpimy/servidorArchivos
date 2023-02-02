@@ -12,12 +12,12 @@
 		<button onclick="myFunction()">this</button>
 		<br><br>
 		Or execute the following command:<br><br>
-		<b>curl -X POST localhost:8000 -d '{"name":"neco","password":"none","file":"neco-arc"}' &gt&gt test.gif\
+		<b>curl -X POST {{.Url}}{{.Port}} -d '{"name":"neco","password":"none","file":"neco-arc"}' &gt&gt test.gif
 </b>
 
 <script>
 function myFunction() {
-			fetch ("http://localhost:8000",{method:"POST",body:'{"file":"neco-arc","password":"none","name":"neco"}'})
+	fetch ("{{.Url}}{{.Port}}",{method:"POST",body:'{"file":"neco-arc","password":"none","name":"neco"}'})
 				.then(response => response.blob())
 				.then(blob => {
 				  const url = URL.createObjectURL(blob);
